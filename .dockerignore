@@ -1,0 +1,14 @@
+node_modules/
+dist/
+charts/
+helmfile.d/
+.circleci/
+scripts/
+test/
+data-csv/
+.eslintignore
+.eslintrc.js
+.eslintrc.json
+.gitignore
+LICENSE
+README.md
