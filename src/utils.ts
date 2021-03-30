@@ -1,6 +1,8 @@
 import fs, { WriteStream } from 'fs';
 import { Logger } from '@w3f/logger';
 import { DeriveAccountRegistration } from '@polkadot/api-derive/accounts/types';
+import { Extrinsic, Event } from '@polkadot/types/interfaces';
+import { SubscriptionModuleConfig } from './types';
 
 export const isDirEmpty = (path: string): boolean =>{
   return fs.readdirSync(path).length === 0
@@ -67,4 +69,49 @@ export const getDisplayName = (identity: DeriveAccountRegistration): string =>{
   } else {
     return identity.display || ``;
   }
+}
+
+export const asyncForEach = async < T extends {} > (array: Array<T>, callback: (arg0: T, arg1: number, arg2: Array<T>) => void): Promise<void> =>{
+  for (let index = 0; index < array.length; index++) {
+      await callback(array[index], index, array);
+  }
+}
+
+export const isTransferBalancesExtrinsic = (extrinsic: Extrinsic): boolean => {
+  const { method: { method, section } } = extrinsic;
+  return section == 'balances' && ( method == 'transfer' || method == 'transferKeepAlive' )
+}
+
+export const isAuctionsBidExtrinsic = (extrinsic: Extrinsic): boolean => {
+  const { method: { method, section } } = extrinsic;
+  return section == 'auctions' && method == 'bid' 
+}
+
+export const isBalanceTransferEvent = (event: Event): boolean => {
+  //https://polkadot.js.org/docs/substrate/events#transferaccountid-accountid-balance
+  const { method, section } = event;
+  return section == 'balances' && method == 'Transfer';
+}
+
+export const getSubscriptionNotificationConfig = (config: SubscriptionModuleConfig, configSpecific: SubscriptionModuleConfig): {sent: boolean; received: boolean} => {
+  /*
+  Specific config is the most prioritized
+  */
+  const defaultSent = true
+  const defaultReceived = true
+  const defaultModuleSent = config?.sent == false ? false : defaultSent
+  const defaultModuleReceived = config?.received == false ? false : defaultReceived
+  const enabledNotifications = {
+      sent: configSpecific?.sent == false ? false : defaultModuleSent,
+      received: configSpecific?.received == false ? false : defaultModuleReceived
+  }
+  return enabledNotifications
+}
+
+export const delayFunction = (ms: number, fn: () => void): Promise<void> =>{
+  return new Promise( resolve => setTimeout( () => { fn(); resolve;}, ms) );
+}
+
+export const delay = (ms: number): Promise<void> =>{
+  return new Promise( resolve => setTimeout(resolve, ms) );
 }

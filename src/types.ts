@@ -12,6 +12,7 @@ export interface InputConfig {
     endSessionBlockDistance: number;
     bucketUpload: BucketUploadConfig;
     cronjob: CronJobConfig;
+    subscriber: SubscriberConfig;
 }
 
 interface DebugConfig{
@@ -21,6 +22,15 @@ interface DebugConfig{
 
 export interface CronJobConfig{
   enabled: boolean;
+}
+
+export interface SubscriberConfig {
+  subscriptions: Array<Subscribable>;
+  modules?: {
+    transferEvent?: SubscriptionModuleConfig;
+    balanceChange?: SubscriptionModuleConfig;
+    transferExtrinsic?: SubscriptionModuleConfig;
+  };
 }
 
 export interface BucketUploadConfig{
@@ -59,4 +69,36 @@ export interface ChainData {
   totalIssuance: Balance;
   nominatorStaking: DeriveStakingAccount[];
   myValidatorStaking: MyDeriveStakingAccount[];
+}
+
+export interface SubscriptionModuleConfig {
+  enabled?: boolean;
+  sent?: boolean;
+  received?: boolean;
+}
+
+export enum TransactionType {
+  Received,
+  Sent
+}
+
+export interface Subscribable {
+  name: string;
+  address: string;
+  transferEvent?: SubscriptionModuleConfig;
+  balanceChange?: SubscriptionModuleConfig;
+  transferExtrinsic?: SubscriptionModuleConfig;
+}
+
+export interface TransactionData extends Subscribable {
+  txType?: TransactionType;
+  networkId: string;
+  hash?: string;
+  amount?: Balance;
+}
+
+export interface Notifier {
+  newTransaction(data: TransactionData): Promise<string>;
+  newBalanceChange(data: TransactionData): Promise<string>;
+  newTransfer(data: TransactionData): Promise<string>;
 }
