@@ -1,8 +1,8 @@
 import fs, { WriteStream } from 'fs';
 import { Logger } from '@w3f/logger';
 import { DeriveAccountRegistration } from '@polkadot/api-derive/accounts/types';
-import { Extrinsic, Event } from '@polkadot/types/interfaces';
-import { SubscriptionModuleConfig } from './types';
+import { Extrinsic, Event, ParaId, Balance, LeasePeriod } from '@polkadot/types/interfaces';
+import { AuctionData } from './types';
 
 export const isDirEmpty = (path: string): boolean =>{
   return fs.readdirSync(path).length === 0
@@ -77,35 +77,29 @@ export const asyncForEach = async < T extends {} > (array: Array<T>, callback: (
   }
 }
 
-export const isTransferBalancesExtrinsic = (extrinsic: Extrinsic): boolean => {
-  const { method: { method, section } } = extrinsic;
-  return section == 'balances' && ( method == 'transfer' || method == 'transferKeepAlive' )
-}
-
 export const isAuctionsBidExtrinsic = (extrinsic: Extrinsic): boolean => {
   const { method: { method, section } } = extrinsic;
   return section == 'auctions' && method == 'bid' 
 }
 
-export const isBalanceTransferEvent = (event: Event): boolean => {
-  //https://polkadot.js.org/docs/substrate/events#transferaccountid-accountid-balance
-  const { method, section } = event;
-  return section == 'balances' && method == 'Transfer';
+export const isAuctionsNewAuctionExtrinsic = (extrinsic: Extrinsic): boolean => {
+  const { method: { method, section } } = extrinsic;
+  return section == 'auctions' && method == 'new_auction' 
 }
 
-export const getSubscriptionNotificationConfig = (config: SubscriptionModuleConfig, configSpecific: SubscriptionModuleConfig): {sent: boolean; received: boolean} => {
-  /*
-  Specific config is the most prioritized
-  */
-  const defaultSent = true
-  const defaultReceived = true
-  const defaultModuleSent = config?.sent == false ? false : defaultSent
-  const defaultModuleReceived = config?.received == false ? false : defaultReceived
-  const enabledNotifications = {
-      sent: configSpecific?.sent == false ? false : defaultModuleSent,
-      received: configSpecific?.received == false ? false : defaultModuleReceived
-  }
-  return enabledNotifications
+export const isAuctionBidAcceptedEvent = (event: Event): boolean => {
+  const { method, section } = event;
+  return section == 'auctions' && method == 'BidAccepted';
+}
+
+export const extractBidAcceptedInfoFromEvent = (event: Event): AuctionData =>{
+  const who = event.data[0].toString()
+  const paraId = event.data[1] as unknown as ParaId
+  const amount = event.data[2] as unknown as Balance
+  const firstSlot = event.data[3] as unknown as LeasePeriod
+  const lastSlot = event.data[4] as unknown as LeasePeriod
+
+  return {who,paraId,amount,firstSlot,lastSlot}
 }
 
 export const delayFunction = (ms: number, fn: () => void): Promise<void> =>{

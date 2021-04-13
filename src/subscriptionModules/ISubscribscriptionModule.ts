@@ -2,7 +2,7 @@
 
 import { ApiPromise } from "@polkadot/api";
 import { Logger } from "@w3f/logger";
-import { Notifier, SubscriberConfig } from "../types";
+import { IPersister } from "../persister/IPersister";
 
 export interface ISubscriptionModule{
   subscribe(): Promise<void>;
@@ -11,6 +11,6 @@ export interface ISubscriptionModule{
 export interface SubscriptionModuleConstructorParams {
   api: ApiPromise;
   networkId: string;
-  config: SubscriberConfig;
+  persister: IPersister;
   logger: Logger;
 }

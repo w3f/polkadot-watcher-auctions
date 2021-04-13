@@ -4,6 +4,7 @@ import { Config } from '@w3f/config';
 
 import { Subscriber } from '../subscriber';
 import { InputConfig } from '../types';
+import { PersisterFactory } from '../persister/PersisterFactory';
 
 const _createLogger = (cfg: InputConfig): Logger => {
 
@@ -24,6 +25,8 @@ export const startAction = async (cmd): Promise<void> =>{
     server.listen(cfg.port);
 
     const logger = _createLogger(cfg);
-    const subscriber = new Subscriber(cfg,logger);
+    const persister = new PersisterFactory(cfg,logger).makePersister()
+
+    const subscriber = new Subscriber(cfg,persister,logger);
     await subscriber.start();
 }

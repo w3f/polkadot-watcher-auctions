@@ -1,5 +1,5 @@
 import { ApiPromise } from '@polkadot/api';
-import { EraIndex, SessionIndex, BlockNumber, EraRewardPoints, Balance } from '@polkadot/types/interfaces';
+import { EraIndex, SessionIndex, BlockNumber, EraRewardPoints, Balance, ParaId, LeasePeriod } from '@polkadot/types/interfaces';
 import { Compact } from '@polkadot/types';
 import { DeriveStakingAccount } from '@polkadot/api-derive/staking/types';
 
@@ -25,7 +25,6 @@ export interface CronJobConfig{
 }
 
 export interface SubscriberConfig {
-  subscriptions: Array<Subscribable>;
   modules?: {
     transferEvent?: SubscriptionModuleConfig;
     balanceChange?: SubscriptionModuleConfig;
@@ -90,15 +89,10 @@ export interface Subscribable {
   transferExtrinsic?: SubscriptionModuleConfig;
 }
 
-export interface TransactionData extends Subscribable {
-  txType?: TransactionType;
-  networkId: string;
-  hash?: string;
-  amount?: Balance;
-}
-
-export interface Notifier {
-  newTransaction(data: TransactionData): Promise<string>;
-  newBalanceChange(data: TransactionData): Promise<string>;
-  newTransfer(data: TransactionData): Promise<string>;
+export interface AuctionData {
+  who: string;
+  paraId: ParaId;
+  amount: Balance;
+  firstSlot: LeasePeriod;
+  lastSlot: LeasePeriod;
 }

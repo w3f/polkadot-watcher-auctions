@@ -2,10 +2,11 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Logger } from '@w3f/logger';
 import { Text } from '@polkadot/types/primitive';
 import {
-    InputConfig, SubscriberConfig
+    InputConfig
 } from './types';
 import { BlockBased } from './subscriptionModules/blockBased';
 import { SubscriptionModuleConstructorParams } from './subscriptionModules/ISubscribscriptionModule';
+import { IPersister } from './persister/IPersister';
 
 export class Subscriber {
     private chain: Text;
@@ -13,21 +14,15 @@ export class Subscriber {
     private networkId: string;
     private endpoint: string;
     private logLevel: string;
-    private config: SubscriberConfig;
 
     private blockBased: BlockBased;
 
     constructor(
-        cfg: InputConfig,
+        config: InputConfig,
+        private readonly persister: IPersister,
         private readonly logger: Logger) {
-        this.endpoint = cfg.endpoint;
-        this.logLevel = cfg.logLevel;
-
-        this._initSubscriberConfig(cfg)
-    }
-
-    private _initSubscriberConfig = (cfg: InputConfig): void => {
-      this.config = cfg.subscriber
+        this.endpoint = config.endpoint;
+        this.logLevel = config.logLevel;
     }
 
     public start = async (): Promise<void> => {
@@ -36,7 +31,7 @@ export class Subscriber {
 
         if(this.logLevel === 'debug') await this._triggerDebugActions()
 
-        this.config.modules?.transferExtrinsic?.enabled != false && this.blockBased.subscribe()
+        this.blockBased.subscribe()
     }
 
     private _initAPI = async (): Promise<void> =>{
@@ -69,7 +64,7 @@ export class Subscriber {
       const subscriptionModuleConfig: SubscriptionModuleConstructorParams = {
         api: this.api,
         networkId: this.networkId,
-        config: this.config,
+        persister: this.persister,
         logger: this.logger
       }
 
