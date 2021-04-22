@@ -5,7 +5,6 @@ helmfile.d/
 .circleci/
 scripts/
 test/
-data-csv/
 .eslintignore
 .eslintrc.js
 .eslintrc.json

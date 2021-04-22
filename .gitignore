@@ -5,4 +5,4 @@ dist/
 helmfile.d/.cache
 helmfile.d/.config
 helmfile.d/.kube
-data-csv
+helmfile.d/

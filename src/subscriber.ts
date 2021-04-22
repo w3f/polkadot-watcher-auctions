@@ -1,12 +1,13 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { Logger } from '@w3f/logger';
+import { LoggerSingleton } from './logger';
 import { Text } from '@polkadot/types/primitive';
 import {
-    InputConfig
+    InputConfig, InputSubscriberConfig
 } from './types';
 import { BlockBased } from './subscriptionModules/blockBased';
 import { SubscriptionModuleConstructorParams } from './subscriptionModules/ISubscribscriptionModule';
 import { IPersister } from './persister/IPersister';
+import { EventBased } from './subscriptionModules/eventBased';
 
 export class Subscriber {
     private chain: Text;
@@ -14,15 +15,18 @@ export class Subscriber {
     private networkId: string;
     private endpoint: string;
     private logLevel: string;
+    private subscriberConfig: InputSubscriberConfig; 
+    private readonly logger = LoggerSingleton.getInstance()
 
     private blockBased: BlockBased;
+    private eventBased: EventBased;
 
     constructor(
         config: InputConfig,
-        private readonly persister: IPersister,
-        private readonly logger: Logger) {
+        private readonly persister: IPersister) {
         this.endpoint = config.endpoint;
         this.logLevel = config.logLevel;
+        this.subscriberConfig = config.subscriber
     }
 
     public start = async (): Promise<void> => {
@@ -31,7 +35,8 @@ export class Subscriber {
 
         if(this.logLevel === 'debug') await this._triggerDebugActions()
 
-        this.blockBased.subscribe()
+        this.subscriberConfig.modules?.block?.enabled != false && this.blockBased.subscribe()
+        this.subscriberConfig.modules?.event?.enabled != false && this.eventBased.subscribe()
     }
 
     private _initAPI = async (): Promise<void> =>{
@@ -65,10 +70,10 @@ export class Subscriber {
         api: this.api,
         networkId: this.networkId,
         persister: this.persister,
-        logger: this.logger
       }
 
       this.blockBased = new BlockBased(subscriptionModuleConfig)
+      this.eventBased = new EventBased(subscriptionModuleConfig)
     }
 
 }

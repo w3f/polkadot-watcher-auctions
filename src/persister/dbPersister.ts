@@ -1,16 +1,18 @@
-import Database from "../db";
-import { AuctionData } from "../types";
+import Database from "./db";
+import { AuctionData, InputMongoConfig } from "../types";
 import { IPersister } from "./IPersister";
+import { LoggerSingleton } from '../logger'
 
 export class DbPersister implements IPersister {
   private db: Database
+  private readonly logger = LoggerSingleton.getInstance()
 
-  constructor(private readonly config, private readonly logger){
+  constructor(private readonly config: InputMongoConfig){
     this.initDb()
   }
   
   private initDb = async () => {
-    this.db = await Database.create(this.config.db.mongo.uri);
+    this.db = await Database.create(this.config.uri);
   }
 
   newAuctionsBidAccepted = async (data: AuctionData): Promise<string> => {

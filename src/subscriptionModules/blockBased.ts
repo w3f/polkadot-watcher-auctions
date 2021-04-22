@@ -1,16 +1,15 @@
 import { ApiPromise} from '@polkadot/api';
-import { Logger } from '@w3f/logger';
 import { Extrinsic, Header } from '@polkadot/types/interfaces';
 import { isAuctionsBidExtrinsic, isAuctionsNewAuctionExtrinsic } from '../utils';
 import { ISubscriptionModule, SubscriptionModuleConstructorParams } from './ISubscribscriptionModule';
+import { LoggerSingleton } from '../logger';
 
 export class BlockBased implements ISubscriptionModule {
     private readonly api: ApiPromise
-    private readonly logger: Logger
+    private readonly logger = LoggerSingleton.getInstance()
 
     constructor(params: SubscriptionModuleConstructorParams) {
         this.api = params.api
-        this.logger = params.logger
     }
 
     public subscribe = async (): Promise<void> => {

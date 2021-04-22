@@ -53,24 +53,6 @@ export const closeFile = (file: WriteStream): Promise<void> => {
   });
 }
 
-export const getDisplayName = (identity: DeriveAccountRegistration): string =>{
-  /* TODO
-  This code is coming from https://github.com/mariopino/substrate-data-csv/blob/master/utils.js
-  and needs to be refactored
-  */
-
-  if (
-    identity.displayParent &&
-    identity.displayParent !== `` &&
-    identity.display &&
-    identity.display !== ``
-  ) {
-    return `${identity.displayParent.replace(/\n/g, '')} / ${identity.display.replace(/\n/g, '')}`;
-  } else {
-    return identity.display || ``;
-  }
-}
-
 export const asyncForEach = async < T extends {} > (array: Array<T>, callback: (arg0: T, arg1: number, arg2: Array<T>) => void): Promise<void> =>{
   for (let index = 0; index < array.length; index++) {
       await callback(array[index], index, array);

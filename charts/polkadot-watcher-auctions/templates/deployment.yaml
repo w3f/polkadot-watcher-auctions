@@ -1,4 +1,3 @@
-{{ if ne .Values.config.cronjob.enabled true }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -43,26 +42,7 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /app/config 
-        - name: service-account
-          mountPath: {{ dir .Values.config.bucketUpload.gcpServiceAccount }}
-          readOnly: true
-        {{ if ne .Values.environment "ci" }}    
-        - name: data-csv
-          mountPath: {{ .Values.config.exportDir }}
-        {{ end }}  
       volumes:
       - name: config
         configMap:
           name: {{ .Release.Name }} 
-      - name: service-account
-        secret:
-          secretName: {{ .Release.Name }}
-          items:
-          - key: service_account_json
-            path: {{ base .Values.config.bucketUpload.gcpServiceAccount }}
-      {{ if ne .Values.environment "ci" }}       
-      - name: data-csv
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}
-      {{ end }}  
-{{ end }}        

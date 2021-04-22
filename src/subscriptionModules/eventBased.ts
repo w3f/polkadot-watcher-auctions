@@ -1,5 +1,4 @@
 import { ApiPromise} from '@polkadot/api';
-import { Logger } from '@w3f/logger';
 import {
     AuctionData
 } from '../types';
@@ -7,16 +6,16 @@ import { Event } from '@polkadot/types/interfaces';
 import { extractBidAcceptedInfoFromEvent, isAuctionBidAcceptedEvent } from '../utils';
 import { ISubscriptionModule, SubscriptionModuleConstructorParams } from './ISubscribscriptionModule';
 import { IPersister } from '../persister/IPersister';
+import { LoggerSingleton } from '../logger';
 
 export class EventBased implements ISubscriptionModule{
 
     private readonly api: ApiPromise
     private readonly persister: IPersister
-    private readonly logger: Logger
+    private readonly logger = LoggerSingleton.getInstance()
     
     constructor(params: SubscriptionModuleConstructorParams) {
       this.api = params.api
-      this.logger = params.logger
       this.persister = params.persister
     }
 

@@ -1,10 +1,10 @@
-import { Logger } from "@w3f/logger";
+import { InputPersisterConfig } from "../types";
 import { DbPersister } from "./dbPersister";
 
 export class PersisterFactory {
-  constructor(private readonly cfg: any, private readonly logger: Logger){}
+  constructor(private readonly cfg: InputPersisterConfig){}
 
   makePersister = () => {
-    return new DbPersister(this.cfg,this.logger)
+    return new DbPersister(this.cfg.mongo)
   }
 }
