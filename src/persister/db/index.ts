@@ -43,9 +43,9 @@ export default class Db {
     const newBid = new this.auctionsBidsAcceptedModel({
       who: bid.who,
       paraId: bid.paraId.toNumber(),
-      amount: bid.paraId.toNumber(),
-      firstSlot: bid.paraId.toNumber(),
-      lastSlot: bid.paraId.toNumber()
+      amount: bid.amount.toNumber(),
+      firstSlot: bid.firstSlot.toNumber(),
+      lastSlot: bid.lastSlot.toNumber()
     })
     this.logger.info(`Saving the New Bid into the db:`)
     this.logger.info(`${newBid}`)
