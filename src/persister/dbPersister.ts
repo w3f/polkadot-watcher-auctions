@@ -1,5 +1,5 @@
 import Database from "./db";
-import { AuctionData, InputMongoConfig } from "../types";
+import { AuctionData, AuctionExtrinsicData, InputMongoConfig } from "../types";
 import { IPersister } from "./IPersister";
 import { LoggerSingleton } from '../logger'
 
@@ -17,10 +17,20 @@ export class DbPersister implements IPersister {
 
   newAuctionsBidAccepted = async (data: AuctionData): Promise<string> => {
     try {
-      await this.db.setNewBid(data)
+      await this.db.setNewBidAccepted(data)
       return ""
     } catch (error) {
-      this.logger.error(`could not notify Transfer Event: ${error.message}`);
+      this.logger.error(`could not persist Auction New Bid Event: ${error.message}`);
+      return error.message
+    }
+  }
+
+  newAuctionsBidExtrinsic = async (data: AuctionExtrinsicData): Promise<string> => {
+    try {
+      await this.db.setNewBidExtrinsic(data)
+      return ""
+    } catch (error) {
+      this.logger.error(`could not persist Auction Bid Extrinsic: ${error.message}`);
       return error.message
     }
   }

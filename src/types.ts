@@ -44,12 +44,18 @@ export interface BidAcceptedInfo {
   lastSlot: LeasePeriod;
 }
 
+export interface ExtrinsicBidInfo extends BidAcceptedInfo {
+  auctionIndex: ParaId;
+}
+
 export interface AuctionData extends BidAcceptedInfo {
   networkId: string;
   blockNumber: number;
   timestamp: number;
 }
 
-export interface ExtrinsicBidInfo extends BidAcceptedInfo {
-  auctionIndex: ParaId;
+export interface AuctionExtrinsicData extends ExtrinsicBidInfo {
+  networkId: string;
+  blockNumber: number;
+  timestamp: number;
 }

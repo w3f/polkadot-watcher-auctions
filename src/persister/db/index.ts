@@ -1,20 +1,23 @@
 import mongoose from "mongoose";
 
 import {
-  AuctionsBidsAcceptedSchema
+  AuctionsBidExtrinsicSchema,
+  AuctionsBidAcceptedSchema
 } from "./models";
 import { LoggerSingleton } from '../../logger'
-import { AuctionData } from "../../types";
+import { AuctionData, AuctionExtrinsicData } from "../../types";
 
 // Sets a global configuration to silence mongoose deprecation warnings.
 (mongoose as any).set("useFindAndModify", false);
 
 export default class Db {
-  private auctionsBidsAcceptedModel;
+  private auctionsBidAcceptedModel;
+  private auctionsBidExtrinsicsModel;
   private readonly logger = LoggerSingleton.getInstance()
 
   constructor() {
-    this.auctionsBidsAcceptedModel = mongoose.model("AuctionsBidsAccepted", AuctionsBidsAcceptedSchema)
+    this.auctionsBidAcceptedModel = mongoose.model("AuctionsBidsAccepted", AuctionsBidAcceptedSchema)
+    this.auctionsBidExtrinsicsModel = mongoose.model("AuctionsBidExtrinsic", AuctionsBidExtrinsicSchema)
   }
 
   static async create(uri = "mongodb://localhost:27017/auction"): Promise<Db> {
@@ -39,8 +42,8 @@ export default class Db {
     });
   }
 
-  async setNewBid(bid: AuctionData): Promise<boolean> {
-    const newBid = new this.auctionsBidsAcceptedModel({
+  async setNewBidAccepted(bid: AuctionData): Promise<boolean> {
+    const newBid = new this.auctionsBidAcceptedModel({
       networkId: bid.networkId,
       who: bid.who,
       paraId: bid.paraId.toNumber(),
@@ -50,7 +53,24 @@ export default class Db {
       blockNumber: bid.blockNumber,
       timestamp: bid.timestamp
     }) 
-    this.logger.info(`Saving the New Bid into the db:`)
+    this.logger.info(`Saving the New Bid Accepted Event into the db:`)
+    this.logger.info(`${newBid}`)
+    return newBid.save()
+  }
+
+  async setNewBidExtrinsic(bid: AuctionExtrinsicData): Promise<boolean> {
+    const newBid = new this.auctionsBidExtrinsicsModel({
+      networkId: bid.networkId,
+      who: bid.who,
+      paraId: bid.paraId.toNumber(),
+      auctionIndex: bid.auctionIndex.toNumber(),
+      amount: bid.amount.toNumber(),
+      firstSlot: bid.firstSlot.toNumber(),
+      lastSlot: bid.lastSlot.toNumber(),
+      blockNumber: bid.blockNumber,
+      timestamp: bid.timestamp
+    }) 
+    this.logger.info(`Saving the New Bid Extrinsic into the db:`)
     this.logger.info(`${newBid}`)
     return newBid.save()
   }
