@@ -22,8 +22,8 @@ config:
 
 resources: 
   requests:
-    cpu: "800m"
-    memory: "1Gi"
+    cpu: "100m"
+    memory: "200Mi"
   limits:
-    cpu: "2200m"
-    memory: "2Gi" 
+    cpu: "300m"
+    memory: "600Mi" 

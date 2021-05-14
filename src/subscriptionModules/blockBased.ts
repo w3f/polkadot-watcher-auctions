@@ -1,6 +1,6 @@
 import { ApiPromise} from '@polkadot/api';
 import { Extrinsic, Header } from '@polkadot/types/interfaces';
-import { isAuctionsBidExtrinsic, isAuctionsNewAuctionExtrinsic } from '../utils';
+import { extractBidInfoFromExtrinsic, isAuctionsBidExtrinsic, isAuctionsNewAuctionExtrinsic } from '../utils';
 import { ISubscriptionModule, SubscriptionModuleConstructorParams } from './ISubscribscriptionModule';
 import { LoggerSingleton } from '../logger';
 
@@ -35,11 +35,11 @@ export class BlockBased implements ISubscriptionModule {
 
       block.block.extrinsics.forEach( async (extrinsic) => {
 
-        if(!isAuctionsBidExtrinsic(extrinsic)) {
-          this._auctionsBidExtrinsicHandler(extrinsic, hash)
+        if(isAuctionsBidExtrinsic(extrinsic)) {
+          this._auctionsBidExtrinsicHandler(extrinsic, header)
         }
 
-        if(!isAuctionsNewAuctionExtrinsic(extrinsic)) {
+        if(isAuctionsNewAuctionExtrinsic(extrinsic)) {
           this._auctionsNewAuctionExtrinsicHandler(extrinsic, hash)
         }
 
@@ -47,13 +47,18 @@ export class BlockBased implements ISubscriptionModule {
 
     }
 
-    private _auctionsBidExtrinsicHandler = async (extrinsic: Extrinsic, blockHash: string): Promise<void> =>{
-      this.logger.info(`detected new AuctionsBidExtrinsic: ${JSON.stringify(extrinsic.toHuman())}`)
-      const { signer, method: { args } } = extrinsic;
+    private _auctionsBidExtrinsicHandler = async (extrinsic: Extrinsic, header: Header): Promise<void> =>{
+      this.logger.info(`detected new auctions > bid extrinsic`)
+      this.logger.info(`raw: ${JSON.stringify(extrinsic.toHuman())}`)
+      const blockNumber = header.number.unwrap()
+      const timestamp = await this.api.query.timestamp.now() //TODO better to get it from the block itself
+      const bidInfo = extractBidInfoFromExtrinsic(extrinsic)
+      this.logger.info(`processed: ${JSON.stringify( {blockNumber,timestamp,...bidInfo} )}`)
     }
 
     private _auctionsNewAuctionExtrinsicHandler = async (extrinsic: Extrinsic, blockHash: string): Promise<void> =>{
-      this.logger.info(`detected new AuctionsNewAuctionExtrinsic: ${JSON.stringify(extrinsic.toHuman())}`)
+      this.logger.info(`detected new auctions > newAuction extrinsic: ${JSON.stringify(extrinsic.toHuman())}`)
       const { signer, method: { args } } = extrinsic;
+      const sender = signer.toString()
     }
 }

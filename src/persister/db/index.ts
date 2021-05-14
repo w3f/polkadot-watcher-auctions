@@ -41,12 +41,15 @@ export default class Db {
 
   async setNewBid(bid: AuctionData): Promise<boolean> {
     const newBid = new this.auctionsBidsAcceptedModel({
+      networkId: bid.networkId,
       who: bid.who,
       paraId: bid.paraId.toNumber(),
       amount: bid.amount.toNumber(),
       firstSlot: bid.firstSlot.toNumber(),
-      lastSlot: bid.lastSlot.toNumber()
-    })
+      lastSlot: bid.lastSlot.toNumber(),
+      blockNumber: bid.blockNumber,
+      timestamp: bid.timestamp
+    }) 
     this.logger.info(`Saving the New Bid into the db:`)
     this.logger.info(`${newBid}`)
     return newBid.save()

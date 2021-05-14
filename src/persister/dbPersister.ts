@@ -11,7 +11,7 @@ export class DbPersister implements IPersister {
     this.initDb()
   }
   
-  private initDb = async () => {
+  private initDb = async (): Promise<void> => {
     this.db = await Database.create(this.config.uri);
   }
 

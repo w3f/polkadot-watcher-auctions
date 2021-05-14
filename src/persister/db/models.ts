@@ -1,9 +1,12 @@
 import { Schema } from "mongoose";
 
 export const AuctionsBidsAcceptedSchema = new Schema({
-  who: String,
+  networkId: String,
   paraId: Number,
+  who: String,
   amount: Number,
   firstSlot: Number,
   lastSlot: Number,
+  blockNumber: Number,
+  timestamp: Number,
 });

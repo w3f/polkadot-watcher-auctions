@@ -14,7 +14,7 @@ interface DebugConfig{
 }
 
 export interface InputPersisterConfig {
-  mongo: InputMongoConfig
+  mongo: InputMongoConfig;
 }
 
 export interface InputMongoConfig {
@@ -36,10 +36,20 @@ export interface SubscriptionModuleConfig {
   enabled?: boolean;
 }
 
-export interface AuctionData {
-  who: string;
+export interface BidAcceptedInfo {
   paraId: ParaId;
+  who: string;
   amount: Balance;
   firstSlot: LeasePeriod;
   lastSlot: LeasePeriod;
+}
+
+export interface AuctionData extends BidAcceptedInfo {
+  networkId: string;
+  blockNumber: number;
+  timestamp: number;
+}
+
+export interface ExtrinsicBidInfo extends BidAcceptedInfo {
+  auctionIndex: ParaId;
 }

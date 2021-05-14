@@ -11,11 +11,14 @@ import { LoggerSingleton } from '../logger';
 export class EventBased implements ISubscriptionModule{
 
     private readonly api: ApiPromise
+    private readonly networkId: string
     private readonly persister: IPersister
     private readonly logger = LoggerSingleton.getInstance()
+
     
     constructor(params: SubscriptionModuleConstructorParams) {
       this.api = params.api
+      this.networkId = params.networkId
       this.persister = params.persister
     }
 
@@ -44,11 +47,20 @@ export class EventBased implements ISubscriptionModule{
 
     private _bidAcceptedHandler = async (event: Event): Promise<void> => {
       this.logger.debug('Auctions Bid Accepted Event Received')
+      const [timestamp, blockNumber] = await Promise.all([
+        this.api.query.timestamp.now(),
+        this.api.query.system.number()
+      ]);
       const bidInfo = extractBidAcceptedInfoFromEvent(event)
       this.logger.debug(`${JSON.stringify(bidInfo)}`)
       const {who} = bidInfo
       this.logger.info(`New Auctions Bid Accepted Event from ${who} detected`)
-      this._notifyNewAuctionsBidAccepted(bidInfo)
+      this._notifyNewAuctionsBidAccepted({
+        ...bidInfo,
+        networkId: this.networkId,
+        blockNumber:blockNumber.toNumber(),
+        timestamp:timestamp.toNumber()
+      })
     }
     
     private _notifyNewAuctionsBidAccepted = async (data: AuctionData): Promise<void> => {
