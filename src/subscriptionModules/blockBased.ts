@@ -62,6 +62,8 @@ export class BlockBased implements ISubscriptionModule {
       this.logger.info(`processed: ${JSON.stringify( {blockNumber,timestamp,networkId: this.networkId,...bidInfo} )}`)
       this._notifyNewAuctionsBid({
         ...bidInfo,
+        section:'auctions',
+        method:'bid',
         networkId: this.networkId,
         blockNumber:blockNumber.toNumber(),
         timestamp:timestamp.toNumber()

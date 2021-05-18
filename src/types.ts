@@ -55,6 +55,8 @@ export interface AuctionData extends BidAcceptedInfo {
 }
 
 export interface AuctionExtrinsicData extends ExtrinsicBidInfo {
+  section: string;
+  method: string;
   networkId: string;
   blockNumber: number;
   timestamp: number;

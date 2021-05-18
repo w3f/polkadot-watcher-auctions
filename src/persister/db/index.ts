@@ -60,6 +60,8 @@ export default class Db {
 
   async setNewBidExtrinsic(bid: AuctionExtrinsicData): Promise<boolean> {
     const newBid = new this.auctionsBidExtrinsicsModel({
+      section: bid.section,
+      method: bid.method,
       networkId: bid.networkId,
       who: bid.who,
       paraId: bid.paraId.toNumber(),

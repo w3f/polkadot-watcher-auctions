@@ -12,6 +12,8 @@ export const AuctionsBidAcceptedSchema = new Schema({
 });
 
 export const AuctionsBidExtrinsicSchema = new Schema({
+  section: String,
+  method: String,
   networkId: String,
   paraId: Number,
   auctionIndex: Number,
