@@ -1,5 +1,5 @@
 import Database from "./db";
-import { AuctionData, AuctionExtrinsicData, InputMongoConfig } from "../types";
+import { AuctionData, AuctionExtrinsicData, CrowdloanEventData, InputMongoConfig } from "../types";
 import { IPersister } from "./IPersister";
 import { LoggerSingleton } from '../logger'
 
@@ -31,6 +31,16 @@ export class DbPersister implements IPersister {
       return ""
     } catch (error) {
       this.logger.error(`could not persist Auction Bid Extrinsic: ${error.message}`);
+      return error.message
+    }
+  }
+
+  newCrowdloanContributedEvent = async (data: CrowdloanEventData): Promise<string> => {
+    try {
+      await this.db.setNewCrowdloanContributedEvent(data)
+      return ""
+    } catch (error) {
+      this.logger.error(`could not persist Crowdloan Contributed Event: ${error.message}`);
       return error.message
     }
   }

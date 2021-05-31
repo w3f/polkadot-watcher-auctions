@@ -36,6 +36,8 @@ export interface SubscriptionModuleConfig {
   enabled?: boolean;
 }
 
+//AUCTIONS
+
 export interface BidAcceptedInfo {
   paraId: ParaId;
   who: string;
@@ -55,6 +57,22 @@ export interface AuctionData extends BidAcceptedInfo {
 }
 
 export interface AuctionExtrinsicData extends ExtrinsicBidInfo {
+  section: string;
+  method: string;
+  networkId: string;
+  blockNumber: number;
+  timestamp: number;
+}
+
+//CROWDLOANS
+
+export interface CrowdloanContributedInfo {
+  paraId: ParaId;
+  who: string;
+  amount: Balance;
+}
+
+export interface CrowdloanEventData extends CrowdloanContributedInfo {
   section: string;
   method: string;
   networkId: string;

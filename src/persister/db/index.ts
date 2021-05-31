@@ -2,10 +2,11 @@ import mongoose from "mongoose";
 
 import {
   AuctionsBidExtrinsicSchema,
-  AuctionsBidAcceptedSchema
+  AuctionsBidAcceptedSchema,
+  CrowdloanContributedEventSchema
 } from "./models";
 import { LoggerSingleton } from '../../logger'
-import { AuctionData, AuctionExtrinsicData } from "../../types";
+import { AuctionData, AuctionExtrinsicData, CrowdloanEventData } from "../../types";
 
 // Sets a global configuration to silence mongoose deprecation warnings.
 (mongoose as any).set("useFindAndModify", false);
@@ -13,11 +14,13 @@ import { AuctionData, AuctionExtrinsicData } from "../../types";
 export default class Db {
   private auctionsBidAcceptedModel;
   private auctionsBidExtrinsicsModel;
+  private crowdloanContributedEventModel;
   private readonly logger = LoggerSingleton.getInstance()
 
   constructor() {
     this.auctionsBidAcceptedModel = mongoose.model("AuctionsBidsAccepted", AuctionsBidAcceptedSchema)
     this.auctionsBidExtrinsicsModel = mongoose.model("AuctionsBidExtrinsic", AuctionsBidExtrinsicSchema)
+    this.crowdloanContributedEventModel = mongoose.model("CrowdloanContributedEvent", CrowdloanContributedEventSchema)
   }
 
   static async create(uri = "mongodb://localhost:27017/auction"): Promise<Db> {
@@ -75,6 +78,22 @@ export default class Db {
     this.logger.info(`Saving the New Bid Extrinsic into the db:`)
     this.logger.info(`${newBid}`)
     return newBid.save()
+  }
+
+  async setNewCrowdloanContributedEvent(crowdloan: CrowdloanEventData): Promise<boolean> {
+    const newCrowdloan = new this.crowdloanContributedEventModel({
+      section: crowdloan.section,
+      method: crowdloan.method,
+      networkId: crowdloan.networkId,
+      who: crowdloan.who,
+      paraId: crowdloan.paraId.toNumber(),
+      amount: crowdloan.amount.toNumber(),
+      blockNumber: crowdloan.blockNumber,
+      timestamp: crowdloan.timestamp
+    }) 
+    this.logger.info(`Saving the New Crowdloan Contributed Event into the db:`)
+    this.logger.info(`${newCrowdloan}`)
+    return newCrowdloan.save()
   }
 
 

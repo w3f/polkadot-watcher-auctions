@@ -1,7 +1,7 @@
 import fs, { WriteStream } from 'fs';
 import { Logger } from '@w3f/logger';
 import { Extrinsic, Event, ParaId, Balance, LeasePeriod } from '@polkadot/types/interfaces';
-import { BidAcceptedInfo, ExtrinsicBidInfo } from './types';
+import { BidAcceptedInfo, CrowdloanContributedInfo, ExtrinsicBidInfo } from './types';
 
 export const isDirEmpty = (path: string): boolean =>{
   return fs.readdirSync(path).length === 0
@@ -85,6 +85,11 @@ export const isAuctionBidAcceptedEvent = (event: Event): boolean => {
   return section == 'auctions' && method == 'BidAccepted';
 }
 
+export const isCrowdloanContributedEvent = (event: Event): boolean => {
+  const { method, section } = event;
+  return section == 'crowdloan' && method == 'Contributed';
+}
+
 export const extractBidAcceptedInfoFromEvent = (event: Event): BidAcceptedInfo =>{
   const who = event.data[0].toString()
   const paraId = event.data[1] as unknown as ParaId
@@ -93,6 +98,14 @@ export const extractBidAcceptedInfoFromEvent = (event: Event): BidAcceptedInfo =
   const lastSlot = event.data[4] as unknown as LeasePeriod
 
   return {who,paraId,amount,firstSlot,lastSlot}
+}
+
+export const extractCrowdloanContributedInfoFromEvent = (event: Event): CrowdloanContributedInfo =>{
+  const who = event.data[0].toString()
+  const paraId = event.data[1] as unknown as ParaId
+  const amount = event.data[2] as unknown as Balance
+
+  return {who,paraId,amount}
 }
 
 export const delayFunction = (ms: number, fn: () => void): Promise<void> =>{
